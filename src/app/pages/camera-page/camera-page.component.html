@@ -1,0 +1,28 @@
+<section *ngIf="showWebcam">
+  <div class="container-cam" >
+    <webcam
+      (imageCapture)="handleImage($event)"
+      [imageQuality]="1"
+      [allowCameraSwitch]="false"
+      [trigger]="triggerObservable"
+      [width]="1280"
+      [height]="720"
+    ></webcam>
+  </div>
+  <div class="container-button">
+    <button (click)="triggerSnapshot()">📷</button>
+  </div>
+</section>
+
+<section *ngIf="!showWebcam">
+  <div class="snapshot" *ngIf="webcamImage">
+    <div>
+      <h2>Nice shoot!</h2>
+      <button (click)="toggleShowCamera()">🔄</button>
+    </div>
+    <img [src]="webcamImage.imageAsDataUrl" />
+    <div class="container-button">
+      <qr-code [value]="'url'" [size]="200"></qr-code>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,19 @@
+
+body {
+  background: linear-gradient(255deg, #3f5efb, #fc466b);
+  background-size: 400% 400%;
+
+  -webkit-animation: AnimationName 22s ease infinite;
+  animation: AnimationName 22s ease infinite;
+}
+
+@-webkit-keyframes AnimationName {
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+@keyframes AnimationName {
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
