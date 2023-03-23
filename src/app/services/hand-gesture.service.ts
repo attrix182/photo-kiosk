@@ -44,7 +44,7 @@ export class HandGesture {
   initialize(canvas: HTMLCanvasElement, video: HTMLVideoElement): void {
     this._dimensions = [video.width, video.height];
     navigator.mediaDevices
-      .getUserMedia({ video: {facingMode:'user'} })
+      .getUserMedia({ video: true })
       .then((stream) => {
         this._stream = stream;
         return handpose.load();
