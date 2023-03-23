@@ -1,12 +1,21 @@
 <section *ngIf="showWebcam">
-  <div class="container-cam" >
+  <div class="container-cam">
+    <div *ngIf="showTimer" style="position: absolute; font-size: 2em;">
+      <div class="spinner"></div>
+    </div>
+    <div>
+      <video [srcObject]="stream" #video width="640" height="480" autoplay style="display: none"></video>
+      <canvas #canvas width="640" height="480"></canvas>
+    </div>
+
     <webcam
+      style="display: none"
       (imageCapture)="handleImage($event)"
       [imageQuality]="1"
       [allowCameraSwitch]="false"
       [trigger]="triggerObservable"
-      [width]="1280"
-      [height]="720"
+      [width]="640"
+      [height]="480"
     ></webcam>
   </div>
   <div class="container-button">
