@@ -10,7 +10,7 @@ import { GE } from './fingere.gesture';
 const GestureMap = {
   thumbs_up: 'ok',
   victory: 'two',
-  one_finger: 'one',
+  one_finger: 'one'
 };
 
 type Gesture = 'one' | 'two' | 'ok' | 'none';
@@ -44,10 +44,12 @@ export class HandGesture {
   initialize(canvas: HTMLCanvasElement, video: HTMLVideoElement): void {
     this._dimensions = [video.width, video.height];
     navigator.mediaDevices
-      .getUserMedia({ video: true })
+      .getUserMedia({ audio: false, video: true})
       .then((stream) => {
         this._stream = stream;
         return handpose.load();
+
+
       })
       .then((model) => {
         const context = canvas.getContext('2d');

@@ -1,11 +1,15 @@
 <section *ngIf="showWebcam">
   <div class="container-cam">
-    <div *ngIf="showTimer" style="position: absolute; font-size: 2em;">
-      <div class="spinner"></div>
+    <div *ngIf="showTimer" style="position: absolute;">
+      <div class="cwrap"><div class="cmove">
+        <div>3</div> <div>2</div>
+        <div>1</div> <div id="smile">SMILE!</div>
+      </div></div>
     </div>
+    <div class="flash" *ngIf="showFlash"></div>
     <div>
-      <video [srcObject]="stream" #video width="640" height="480" autoplay style="display: none"></video>
-      <canvas #canvas width="640" height="480"></canvas>
+      <video [srcObject]="stream" #video width="640" height="480" id="camera--view" muted autoplay playsinline style="display: none"></video>
+      <canvas  #canvas width="640" height="480"></canvas>
     </div>
 
     <webcam
@@ -14,8 +18,8 @@
       [imageQuality]="1"
       [allowCameraSwitch]="false"
       [trigger]="triggerObservable"
-      [width]="640"
-      [height]="480"
+      [width]="screenWidth"
+      [height]="screenHeight"
     ></webcam>
   </div>
   <div class="container-button">
@@ -29,9 +33,11 @@
       <h2>Nice shoot!</h2>
       <button (click)="toggleShowCamera()">🔄</button>
     </div>
-    <img [src]="webcamImage.imageAsDataUrl" />
+    <img style="transform: scaleX(-1);" [src]="webcamImage.imageAsDataUrl" width="640" height="480"/>
     <div class="container-button">
       <qr-code [value]="'url'" [size]="200"></qr-code>
     </div>
   </div>
 </section>
+
+{{opened$ | async}}

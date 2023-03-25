@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { WebcamImage } from 'ngx-webcam';
 import { filter, map, Observable, Subject, tap, withLatestFrom } from 'rxjs';
 import { HandGesture } from 'src/app/services/hand-gesture.service';
@@ -14,6 +14,9 @@ export class CameraPageComponent implements OnInit {
   public webcamImage!: WebcamImage;
   private trigger: Subject<void> = new Subject<void>();
   showTimer: boolean = false;
+  showFlash: boolean = false;
+  screenHeight: number = window.innerHeight;
+  screenWidth: number = window.innerWidth;
   @ViewChild('canvas') canvas: ElementRef<HTMLCanvasElement> | undefined;
   @ViewChild('video') video: any;
 
@@ -39,6 +42,14 @@ export class CameraPageComponent implements OnInit {
 
   ngOnInit(): void {}
 
+  @HostListener('window:resize', ['$event'])
+  onResize(event?) {
+    this.screenHeight = window.innerHeight;
+    this.screenWidth = window.innerWidth;
+
+    console.log(this.screenHeight, this.screenWidth);
+  }
+
   ngAfterViewInit() {
     this.handService.initialize(this.canvas?.nativeElement, this.video.nativeElement);
   }
@@ -49,18 +60,23 @@ export class CameraPageComponent implements OnInit {
 
   handleImage(webcamImage: WebcamImage): void {
     this.webcamImage = webcamImage;
-   // this.uploadImage();
+    // this.uploadImage();
     this.showWebcam = false;
   }
 
   triggerSnapshot() {
     console.log('triggerSnapshot');
     this.showTimer = true;
+    setTimeout(() => {
+      console.log('trigger');
+      this.showFlash = true;
+    }, 2500);
 
     setTimeout(() => {
-    this.trigger.next();
-    this.showTimer = false;
-    }, 3000);
+      this.trigger.next();
+      this.showTimer = false;
+      this.showFlash = false;
+    }, 2900);
   }
 
   toggleShowCamera() {
