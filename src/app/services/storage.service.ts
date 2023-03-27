@@ -17,6 +17,7 @@ export class StorageService {
   InsertCustomID(collectionName: string, idCustom: any, data: any) {
     return this.cloudFireStore.collection(collectionName).doc(idCustom).set(data);
   }
+
   GetByParameter(collection: string, parametro: string, value: any) {
     return this.cloudFireStore
       .collection<any>(collection, (ref) => ref.where(parametro, '==', value))
@@ -47,9 +48,9 @@ export class StorageService {
       );
   }
 
-  InsertImage(collectionName: string, image: any) {
+  InsertImage(collectionName: string, image: any): Promise<string> {
+    return new Promise((resolve, reject) => {
       image.id = this.cloudFireStore.createId();
-      console.log(image.photo);
       const filePath = `/images/${image.id}/image.jpeg`;
       this.storage
         .ref(filePath)
@@ -59,15 +60,23 @@ export class StorageService {
           let storageRef = storages.ref();
           let spaceRef = storageRef.child(filePath);
 
-
-          spaceRef.getDownloadURL().then((url) => {
-            this.fotoCargada = url;
-            this.fotoCargada = `${this.fotoCargada}`;
-            image.photo = url
-            delete image.photo;
-            return this.InsertCustomID(collectionName, image.id, image);
-          });
+          spaceRef
+            .getDownloadURL()
+            .then((url) => {
+              this.fotoCargada = url;
+              this.fotoCargada = `${this.fotoCargada}`;
+              image.photo = url;
+              this.InsertCustomID(collectionName, image.id, image).then(() => {
+                resolve(url);
+              });
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        })
+        .catch((error) => {
+          reject(error);
         });
-
+    });
   }
 }

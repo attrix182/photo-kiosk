@@ -19,25 +19,36 @@ export class CameraPageComponent implements OnInit {
   screenWidth: number = window.innerWidth;
   @ViewChild('canvas') canvas: ElementRef<HTMLCanvasElement> | undefined;
   @ViewChild('video') video: any;
-
-  //sobra
-  opened$ = this.handService.swipe$.pipe(
-    filter((value) => value === 'left' || value === 'right'),
-    map((value) => value === 'right')
-  );
+  url: string;
 
   shot$ = this.handService.gesture$.pipe(
-    filter((value) => value === 'one' || value === 'two'),
-    map((value) => (value === 'one' ? 'one' : 'two'))
+    filter((value) => value === 'ok' || value === 'two'),
+    map((value) => (value === 'ok' ? 'ok' : 'two'))
   );
 
   constructor(private storageSvc: StorageService, private handService: HandGesture) {
     this.handService.gesture$
       .pipe(
-        filter((value) => value === 'two'),
+        filter((value) => value === 'two' || value === 'ok'),
         withLatestFrom(this.shot$)
       )
-      .subscribe((value) => this.triggerSnapshot());
+      .subscribe((value) => {
+        if (value[1] === 'two') {
+          this.triggerSnapshot();
+        }
+        if (value[1] === 'ok') {
+          this.toggleShowCamera();
+        }
+      });
+
+      this.gestureDetected();
+    }
+
+  gestureDetected() {
+    this.handService.gesture$.subscribe((value) => this.showGestureDetected(value));
+  }
+  showGestureDetected(gesture: string) {
+    console.log(gesture);
   }
 
   ngOnInit(): void {}
@@ -60,16 +71,18 @@ export class CameraPageComponent implements OnInit {
 
   handleImage(webcamImage: WebcamImage): void {
     this.webcamImage = webcamImage;
-    // this.uploadImage();
+    this.uploadImage();
     this.showWebcam = false;
   }
 
   triggerSnapshot() {
-    console.log('triggerSnapshot');
+    if (this.showTimer) return;
+    if (this.webcamImage) return;
+
     this.showTimer = true;
     setTimeout(() => {
-      console.log('trigger');
       this.showFlash = true;
+      this.playShootSound();
     }, 2500);
 
     setTimeout(() => {
@@ -79,15 +92,32 @@ export class CameraPageComponent implements OnInit {
     }, 2900);
   }
 
+  playShootSound() {
+    let audio = new Audio();
+    audio.src = '../../../assets/shoot-sound.mp3';
+    audio.load();
+    audio.play();
+  }
+
   toggleShowCamera() {
+    if (!this.webcamImage) return;
+    this.webcamImage = null;
     this.showWebcam = !this.showWebcam;
   }
 
   uploadImage() {
     let image = {
-      photo: this.webcamImage
+      photo: this.webcamImage.imageAsBase64
     };
-    this.storageSvc.InsertImage('images', image);
+    this.storageSvc
+      .InsertImage('images', image)
+      .then((url) => {
+        console.log('URL: ', url);
+        this.url = url;
+      })
+      .catch((error) => {
+        console.error('Ha ocurrido un error:', error);
+      });
   }
 
   public get triggerObservable(): Observable<void> {

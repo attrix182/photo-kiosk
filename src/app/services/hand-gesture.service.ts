@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { HostListener, Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import * as handpose from '@tensorflow-models/handpose';
 
@@ -37,19 +37,29 @@ export class HandGesture {
   private _lastGesture = null;
   private _emitGesture = true;
 
+  screenHeight: number = window.innerHeight;
+  screenWidth: number = window.innerWidth;
+
   get stream(): MediaStream {
     return this._stream;
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event?) {
+    this.screenHeight = window.innerHeight;
+    this.screenWidth = window.innerWidth;
   }
 
   initialize(canvas: HTMLCanvasElement, video: HTMLVideoElement): void {
     this._dimensions = [video.width, video.height];
     navigator.mediaDevices
-      .getUserMedia({ audio: false, video: true})
+      .getUserMedia({
+        audio: false,
+        video: { width: 1280, height: 720 }
+      })
       .then((stream) => {
         this._stream = stream;
         return handpose.load();
-
-
       })
       .then((model) => {
         const context = canvas.getContext('2d');

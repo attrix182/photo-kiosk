@@ -1,15 +1,29 @@
-<section *ngIf="showWebcam">
+<section [hidden]="!showWebcam">
   <div class="container-cam">
-    <div *ngIf="showTimer" style="position: absolute;">
-      <div class="cwrap"><div class="cmove">
-        <div>3</div> <div>2</div>
-        <div>1</div> <div id="smile">SMILE!</div>
-      </div></div>
+    <div *ngIf="showTimer" class="timer">
+      <div class="countdown-wrap">
+        <div class="countdown-slides">
+          <div>3</div>
+          <div>2</div>
+          <div>1</div>
+          <div id="smile">SMILE!</div>
+        </div>
+      </div>
     </div>
     <div class="flash" *ngIf="showFlash"></div>
     <div>
-      <video [srcObject]="stream" #video width="640" height="480" id="camera--view" muted autoplay playsinline style="display: none"></video>
-      <canvas  #canvas width="640" height="480"></canvas>
+      <video
+        [srcObject]="stream"
+        #video
+        width="1280"
+        height="720"
+        id="camera--view"
+        muted
+        autoplay
+        playsinline
+        style="display: none"
+      ></video>
+      <canvas #canvas width="1280" height="720"></canvas>
     </div>
 
     <webcam
@@ -18,26 +32,20 @@
       [imageQuality]="1"
       [allowCameraSwitch]="false"
       [trigger]="triggerObservable"
-      [width]="screenWidth"
-      [height]="screenHeight"
+      [width]="1280"
+      [height]="720"
     ></webcam>
   </div>
-  <div class="container-button">
+  <!--   <div class="container-button">
     <button (click)="triggerSnapshot()">📷</button>
-  </div>
+  </div> -->
 </section>
 
-<section *ngIf="!showWebcam">
+<section *ngIf="!showWebcam" class="container-cam">
   <div class="snapshot" *ngIf="webcamImage">
-    <div>
-      <h2>Nice shoot!</h2>
-      <button (click)="toggleShowCamera()">🔄</button>
-    </div>
-    <img style="transform: scaleX(-1);" [src]="webcamImage.imageAsDataUrl" width="640" height="480"/>
+    <img style="transform: scaleX(-1)" [src]="webcamImage.imageAsDataUrl" width="1280" height="720" />
     <div class="container-button">
-      <qr-code [value]="'url'" [size]="200"></qr-code>
+      <qr-code [value]="url" [size]="200" download></qr-code>
     </div>
   </div>
 </section>
-
-{{opened$ | async}}
